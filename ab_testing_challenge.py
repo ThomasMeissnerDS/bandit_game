@@ -12,7 +12,7 @@ import pandas as pd
 
 np.random.seed(1)
 
-app = Flask(__name__)
+ab_testing_challenge = Flask(__name__)
 
 
 # defining the bandit set up
@@ -113,7 +113,7 @@ def run_experiment():
                 clear()
 
 
-app.add_url_rule('/tool', 'webio_view', webio_view(run_experiment),
+ab_testing_challenge.add_url_rule('/tool', 'webio_view', webio_view(run_experiment),
                  methods=['GET', 'POST', 'OPTIONS'])
 
 if __name__ == '__main__':
