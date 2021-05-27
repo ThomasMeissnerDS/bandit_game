@@ -1,1 +1,1 @@
-web: python app.py --port=$PORT
+web: python ab_testing_challenge.py --port=$PORT
