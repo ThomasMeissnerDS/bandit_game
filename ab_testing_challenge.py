@@ -1,14 +1,15 @@
-from pywebio.input import *
-from pywebio.output import *
 from pywebio.platform.flask import webio_view
 from pywebio import STATIC_PATH
+from flask import Flask, send_from_directory
+from pywebio.input import *
+from pywebio.output import *
+import argparse
+from pywebio import start_server
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
 import pandas as pd
-from flask import Flask, send_from_directory
-from pywebio import start_server
-import argparse
+
 np.random.seed(1)
 
 app = Flask(__name__)
