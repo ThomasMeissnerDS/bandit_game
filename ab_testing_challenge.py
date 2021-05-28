@@ -56,7 +56,8 @@ class ABBandit:
     def pull_arm(self, bandit, rounds, mode='Human'):
         if mode == 'Thompson sampling':
             # Thompson sampling
-            bandit = np.argmax([self.sample(b) for b in self.bandits])
+            bandits_prob = np.argmax([self.sample(b) for b in self.bandits])
+            bandit = self.bandits[bandits_prob]
         else:
             pass
         for i in range(rounds):
