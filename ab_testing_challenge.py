@@ -119,6 +119,15 @@ def run_experiment():
             else:
                 rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
                 df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Human')
+            # show total money won
+            fig = go.Figure(go.Indicator(
+                mode="number",
+                value=bandit_challenge.overall_money_won,
+                domain={'x': [0.1, 1], 'y': [0.2, 0.9]},
+                title={'text': "Money won so far:"}))
+            html = fig.to_html(include_plotlyjs="require", full_html=False)
+            put_html(html).send()
+            # show progress and rounds left
             fig = go.Figure(go.Indicator(
                 mode="number+gauge+delta",
                 gauge={'shape': "bullet"},
