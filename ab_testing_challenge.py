@@ -146,9 +146,9 @@ def run_experiment(page=True):
                                       buttons=[{'label': 'Yes', 'value': True},
                                                {'label': 'No', 'value': False}])
             if continue_button:
-                break
+                clear()
             else:
-                pass
+                break
 
 
 ab_testing_challenge.add_url_rule('/tool', 'webio_view', webio_view(run_experiment),
