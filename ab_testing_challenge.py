@@ -97,11 +97,9 @@ def generate_bar_charts(df, x_axis, y_axis, title):
     return put_html(html).send()
 
 
-# instantiate bandits
-bandit_challenge = ABBandit()
-
-
 def run_experiment():
+    # instantiate bandits
+    bandit_challenge = ABBandit()
     add_more = True
     while add_more:
         add_more = actions(label="Which bandit do you chose?",
