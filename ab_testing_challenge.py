@@ -102,7 +102,8 @@ bandit_challenge = ABBandit()
 run_web_page = True
 
 
-def run_experiment():
+def run_experiment(page=True):
+    run_web_page = page
     while run_web_page:
         add_more = True
 
@@ -146,6 +147,8 @@ def run_experiment():
                                                {'label': 'No', 'value': False}])
             if continue_button:
                 clear()
+            else:
+                add_more = False
 
 
 ab_testing_challenge.add_url_rule('/tool', 'webio_view', webio_view(run_experiment),
