@@ -10,8 +10,6 @@ import plotly.express as px
 import numpy as np
 import pandas as pd
 
-np.random.seed(1)
-
 ab_testing_challenge = Flask(__name__)
 number_of_trials = 6000
 
@@ -98,6 +96,7 @@ def generate_bar_charts(df, x_axis, y_axis, title):
 
 
 def run_experiment():
+    np.random.seed(1)
     # instantiate bandits
     bandit_challenge = ABBandit()
     add_more = True
