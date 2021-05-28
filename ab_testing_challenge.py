@@ -79,10 +79,10 @@ class ABBandit:
             else:
                 pass
         # update df_overview
-        core_data = {'Bandits': list(bandit_challenge.bandits),
-                     'Played': list(bandit_challenge.played.values()),
-                     'Wins': list(bandit_challenge.wins.values()),
-                     'Winrate': list(bandit_challenge.observed_win_rate.values())
+        core_data = {'Bandits': list(self.bandits),
+                     'Played': list(self.played.values()),
+                     'Wins': list(self.wins.values()),
+                     'Winrate': list(self.observed_win_rate.values())
                      }
         df_overview = pd.DataFrame(core_data, columns=['Bandits', 'Played', 'Wins', 'Winrate'])
         return df_overview
