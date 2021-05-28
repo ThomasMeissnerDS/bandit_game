@@ -41,23 +41,24 @@ class ABBandit:
         self.overall_money_won = 0
         self.games_left = 1000
 
-    def pull_arm(self, bandit):
-        if self.games_left > 0:
-            random_chance = np.random.rand()
-            self.played[bandit] += 1
-            self.overall_played += 1
-            if random_chance < self.actual_win_rate[bandit]:
-                self.wins[bandit] += 1
-                self.overall_wins += 1
+    def pull_arm(self, bandit, rounds):
+        for i in range(rounds):
+            if self.games_left > 0:
+                random_chance = np.random.rand()
+                self.played[bandit] += 1
+                self.overall_played += 1
+                if random_chance < self.actual_win_rate[bandit]:
+                    self.wins[bandit] += 1
+                    self.overall_wins += 1
+                else:
+                    pass
+                self.observed_win_rate[bandit] = self.wins[bandit] / self.played[bandit]
+                self.money_won[bandit] = self.wins[bandit] * self.reward_per_win
+                self.overall_winrate = self.overall_wins / self.overall_played
+                self.overall_money_won = self.overall_wins * self.reward_per_win
+                self.games_left = 1000 - self.overall_played
             else:
                 pass
-            self.observed_win_rate[bandit] = self.wins[bandit] / self.played[bandit]
-            self.money_won[bandit] = self.wins[bandit] * self.reward_per_win
-            self.overall_winrate = self.overall_wins / self.overall_played
-            self.overall_money_won = self.overall_wins * self.reward_per_win
-            self.games_left = 1000 - self.overall_played
-        else:
-            pass
         # update df_overview
         core_data = {'Bandits': list(bandit_challenge.bandits),
                      'Played': list(bandit_challenge.played.values()),
@@ -91,8 +92,9 @@ def run_experiment():
                                buttons=[{'label': 'A', 'value': 'A'},
                                         {'label': 'B', 'value': 'B'},
                                         {'label': 'C', 'value': 'C'}])
+            rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
 
-            df_overview = bandit_challenge.pull_arm(add_more)
+            df_overview = bandit_challenge.pull_arm(add_more, rounds)
             fig = go.Figure(go.Indicator(
                 mode="number+gauge+delta",
                 gauge={'shape': "bullet"},
