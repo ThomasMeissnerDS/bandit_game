@@ -99,57 +99,51 @@ def generate_bar_charts(df, x_axis, y_axis, title):
 
 # instantiate bandits
 bandit_challenge = ABBandit()
-run_web_page = True
 
 
-def run_experiment(page=True):
-    run_web_page = page
-    while run_web_page:
-        add_more = True
-
-        while add_more:
-            add_more = actions(label="Which bandit do you chose?",
-                               buttons=[{'label': 'A', 'value': 'A'},
-                                        {'label': 'B', 'value': 'B'},
-                                        {'label': 'C', 'value': 'C'},
-                                        {'label': 'Thompson sampling', 'value': 'Thompson sampling'}])
-            if add_more == 'Thompson sampling':
-                rounds = 1
-                for i in range(bandit_challenge.games_left):
-                    df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
-            else:
-                rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
-                df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Human')
-            # show total money won
-            fig = go.Figure(go.Indicator(
-                mode="number",
-                value=bandit_challenge.overall_money_won,
-                domain={'x': [0.1, 1], 'y': [0.2, 0.9]},
-                title={'text': "Money won so far:"}))
-            html = fig.to_html(include_plotlyjs="require", full_html=False)
-            put_html(html).send()
-            # show progress and rounds left
-            fig = go.Figure(go.Indicator(
-                mode="number+gauge+delta",
-                gauge={'shape': "bullet"},
-                delta={'reference': number_of_trials},
-                value=df_overview['Played'].sum(),
-                domain={'x': [0.1, 1], 'y': [0.2, 0.9]},
-                title={'text': "No. played"}))
-            html = fig.to_html(include_plotlyjs="require", full_html=False)
-            put_html(html).send()
-
-            generate_bar_charts(df_overview, 'Bandits', 'Played', 'Rounds played')
-            generate_bar_charts(df_overview, 'Bandits', 'Winrate', 'Overview of winrates')
-
-            continue_button = actions(label="Do you want to continue",
-                                      buttons=[{'label': 'Yes', 'value': True},
-                                               {'label': 'No', 'value': False}])
-            if continue_button:
-                clear()
-            else:
-                clear()
-                break
+def run_experiment():
+    add_more = True
+    while add_more:
+        add_more = actions(label="Which bandit do you chose?",
+                           buttons=[{'label': 'A', 'value': 'A'},
+                                    {'label': 'B', 'value': 'B'},
+                                    {'label': 'C', 'value': 'C'},
+                                    {'label': 'Thompson sampling', 'value': 'Thompson sampling'}])
+        if add_more == 'Thompson sampling':
+            rounds = 1
+            for i in range(bandit_challenge.games_left):
+                df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
+        else:
+            rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
+            df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Human')
+        # show total money won
+        fig = go.Figure(go.Indicator(
+            mode="number",
+            value=bandit_challenge.overall_money_won,
+            domain={'x': [0.1, 1], 'y': [0.2, 0.9]},
+            title={'text': "Money won so far:"}))
+        html = fig.to_html(include_plotlyjs="require", full_html=False)
+        put_html(html).send()
+        # show progress and rounds left
+        fig = go.Figure(go.Indicator(
+            mode="number+gauge+delta",
+            gauge={'shape': "bullet"},
+            delta={'reference': number_of_trials},
+            value=df_overview['Played'].sum(),
+            domain={'x': [0.1, 1], 'y': [0.2, 0.9]},
+            title={'text': "No. played"}))
+        html = fig.to_html(include_plotlyjs="require", full_html=False)
+        put_html(html).send()
+        generate_bar_charts(df_overview, 'Bandits', 'Played', 'Rounds played')
+        generate_bar_charts(df_overview, 'Bandits', 'Winrate', 'Overview of winrates')
+        continue_button = actions(label="Do you want to continue",
+                                  buttons=[{'label': 'Yes', 'value': True},
+                                           {'label': 'No', 'value': False}])
+        if continue_button:
+            clear()
+        else:
+            clear()
+            break
 
 
 ab_testing_challenge.add_url_rule('/tool', 'webio_view', webio_view(run_experiment),
