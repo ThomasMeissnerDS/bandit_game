@@ -13,11 +13,13 @@ import pandas as pd
 np.random.seed(1)
 
 ab_testing_challenge = Flask(__name__)
+number_of_trials = 6000
 
 
 # defining the bandit set up
 class ABBandit:
     def __init__(self):
+        # general setup
         self.reward_per_win = 0.40
         self.bandits = ['A', 'B', 'C']
         self.played = {'A': 0,
@@ -26,9 +28,9 @@ class ABBandit:
         self.wins = {'A': 0,
                      'B': 0,
                      'C': 0}
-        self.actual_win_rate = {'A': 0.3,
-                                'B': 0.2,
-                                'C': 0.35}
+        self.actual_win_rate = {'A': 0.03,
+                                'B': 0.02,
+                                'C': 0.035}
         self.observed_win_rate = {'A': 0.0,
                                   'B': 0.0,
                                   'C': 0.0}
@@ -39,9 +41,25 @@ class ABBandit:
         self.overall_wins = 0
         self.overall_winrate = 0
         self.overall_money_won = 0
-        self.games_left = 1000
+        self.games_left = number_of_trials
+        # prior/posterior believes
+        self.pri_post_a = {'A': 1,
+                           'B': 1,
+                           'C': 1}
+        self.pri_post_b = {'A': 1,
+                           'B': 1,
+                           'C': 1}
 
-    def pull_arm(self, bandit, rounds):
+    def sample(self, bandit):
+        return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
+
+    def pull_arm(self, bandit, rounds, mode='Human'):
+        if mode == 'Thompson sampling':
+            bandits = [self.actual_win_rate[p] for p in self.bandits]
+            # Thompson sampling
+            bandit = np.argmax([self.sample(b) for b in bandits])
+        else:
+            pass
         for i in range(rounds):
             if self.games_left > 0:
                 random_chance = np.random.rand()
@@ -50,13 +68,14 @@ class ABBandit:
                 if random_chance < self.actual_win_rate[bandit]:
                     self.wins[bandit] += 1
                     self.overall_wins += 1
+                    self.pri_post_a[bandit] += 1
                 else:
-                    pass
+                    self.pri_post_b[bandit] += 1
                 self.observed_win_rate[bandit] = self.wins[bandit] / self.played[bandit]
                 self.money_won[bandit] = self.wins[bandit] * self.reward_per_win
                 self.overall_winrate = self.overall_wins / self.overall_played
                 self.overall_money_won = self.overall_wins * self.reward_per_win
-                self.games_left = 1000 - self.overall_played
+                self.games_left = number_of_trials - self.overall_played
             else:
                 pass
         # update df_overview
@@ -91,14 +110,19 @@ def run_experiment():
             add_more = actions(label="Which bandit do you chose?",
                                buttons=[{'label': 'A', 'value': 'A'},
                                         {'label': 'B', 'value': 'B'},
-                                        {'label': 'C', 'value': 'C'}])
-            rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
-
-            df_overview = bandit_challenge.pull_arm(add_more, rounds)
+                                        {'label': 'C', 'value': 'C'},
+                                        {'label': 'Thompson sampling', 'value': 'Thompson sampling'}])
+            if add_more == 'Thompson sampling':
+                rounds = 1
+                for i in range(bandit_challenge.games_left):
+                    df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
+            else:
+                rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
+                df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Human')
             fig = go.Figure(go.Indicator(
                 mode="number+gauge+delta",
                 gauge={'shape': "bullet"},
-                delta={'reference': 1000},
+                delta={'reference': number_of_trials},
                 value=df_overview['Played'].sum(),
                 domain={'x': [0.1, 1], 'y': [0.2, 0.9]},
                 title={'text': "No. played"}))
@@ -116,7 +140,7 @@ def run_experiment():
 
 
 ab_testing_challenge.add_url_rule('/tool', 'webio_view', webio_view(run_experiment),
-                 methods=['GET', 'POST', 'OPTIONS'])
+                                  methods=['GET', 'POST', 'OPTIONS'])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
