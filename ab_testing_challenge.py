@@ -148,6 +148,7 @@ def run_experiment(page=True):
             if continue_button:
                 clear()
             else:
+                clear()
                 break
 
 
