@@ -20,7 +20,7 @@ number_of_trials = 6000
 class ABBandit:
     def __init__(self):
         # general setup
-        self.reward_per_win = 0.40
+        self.reward_per_win = 50
         self.bandits = ['A', 'B', 'C']
         self.played = {'A': 0,
                        'B': 0,
