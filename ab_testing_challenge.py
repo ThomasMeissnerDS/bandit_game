@@ -146,7 +146,7 @@ def run_experiment(page=True):
                                       buttons=[{'label': 'Yes', 'value': True},
                                                {'label': 'No', 'value': False}])
             if continue_button:
-                clear()
+                break
             else:
                 pass
 
