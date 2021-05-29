@@ -48,12 +48,18 @@ class ABBandit:
                            'B': 1,
                            'C': 1}
 
-    def sample(self, bandit):
-        return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
+    def sample(self, bandit, mode):
+        if mode == 'Thompson sampling':
+            return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
+        elif mode == 'Optimistic Thompson':
+            return np.random.beta(self.pri_post_a[bandit]+100, self.pri_post_b[bandit]+100)
 
     def pull_arm(self, bandit, rounds, mode='Human'):
         if mode == 'Thompson sampling':
             # Thompson sampling
+            bandits_prob = np.argmax([self.sample(b, mode=mode) for b in self.bandits])
+            bandit = self.bandits[bandits_prob]
+        elif mode == 'Optimistic Thompson':
             bandits_prob = np.argmax([self.sample(b) for b in self.bandits])
             bandit = self.bandits[bandits_prob]
         else:
@@ -107,8 +113,13 @@ def run_experiment():
                            buttons=[{'label': 'A', 'value': 'A'},
                                     {'label': 'B', 'value': 'B'},
                                     {'label': 'C', 'value': 'C'},
-                                    {'label': 'Thompson sampling', 'value': 'Thompson sampling'}])
+                                    {'label': 'Thompson sampling', 'value': 'Thompson sampling'},
+                                    {'label': 'Optimistic Thompson', 'value': 'Optimistic Thompson'}])
         if add_more == 'Thompson sampling':
+            rounds = 1
+            for i in range(bandit_challenge.games_left):
+                df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
+        elif add_more == 'Optimistic Thompson':
             rounds = 1
             for i in range(bandit_challenge.games_left):
                 df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
