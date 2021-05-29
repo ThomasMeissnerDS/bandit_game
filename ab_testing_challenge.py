@@ -52,7 +52,7 @@ class ABBandit:
         if mode == 'Thompson sampling':
             return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
         elif mode == 'Optimistic Thompson':
-            return np.random.beta(self.pri_post_a[bandit]+100, self.pri_post_b[bandit]+100)
+            return np.random.beta(self.pri_post_a[bandit]+300, self.pri_post_b[bandit]+100)
 
     def pull_arm(self, bandit, rounds, mode='Human'):
         if mode == 'Thompson sampling':
