@@ -11,12 +11,11 @@ import numpy as np
 import pandas as pd
 
 ab_testing_challenge = Flask(__name__)
-number_of_trials = 6000
 
 
 # defining the bandit set up
 class ABBandit:
-    def __init__(self):
+    def __init__(self, number_of_trials=6000):
         # general setup
         self.reward_per_win = 50
         self.bandits = ['A', 'B', 'C']
@@ -39,6 +38,7 @@ class ABBandit:
         self.overall_wins = 0
         self.overall_winrate = 0
         self.overall_money_won = 0
+        self.number_of_trials = number_of_trials
         self.games_left = number_of_trials
         # prior/posterior believes
         self.pri_post_a = {'A': 1,
@@ -98,7 +98,8 @@ def generate_bar_charts(df, x_axis, y_axis, title):
 def run_experiment():
     np.random.seed(1)
     # instantiate bandits
-    bandit_challenge = ABBandit()
+    number_of_trials = input("What shall be the max. no. of rounds?", value='6000', type=NUMBER)
+    bandit_challenge = ABBandit(number_of_trials=number_of_trials)
     add_more = True
     while add_more:
         add_more = actions(label="Which bandit do you chose?",
