@@ -39,7 +39,7 @@ class ABBandit:
         self.overall_winrate = 0
         self.overall_money_won = 0
         self.number_of_trials = number_of_trials
-        self.games_left = number_of_trials
+        self.games_left = self.number_of_trials
         # prior/posterior believes
         self.pri_post_a = {'A': 1,
                            'B': 1,
@@ -73,7 +73,7 @@ class ABBandit:
                 self.money_won[bandit] = self.wins[bandit] * self.reward_per_win
                 self.overall_winrate = self.overall_wins / self.overall_played
                 self.overall_money_won = self.overall_wins * self.reward_per_win
-                self.games_left = number_of_trials - self.overall_played
+                self.games_left = self.number_of_trials - self.overall_played
             else:
                 pass
         # update df_overview
