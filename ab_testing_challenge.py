@@ -96,8 +96,9 @@ def generate_bar_charts(df, x_axis, y_axis, title):
 
 
 def run_experiment():
-    np.random.seed(1)
     # instantiate bandits
+    random_seed = input("Set random seed (any integer)", value='1', type=NUMBER)
+    np.random.seed(random_seed)
     number_of_trials = input("What shall be the max. no. of rounds?", value='6000', type=NUMBER)
     bandit_challenge = ABBandit(number_of_trials=number_of_trials)
     add_more = True
