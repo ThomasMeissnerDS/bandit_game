@@ -19,6 +19,9 @@ class ABBandit:
         # general setup
         self.reward_per_win = 50
         self.bandits = ['A', 'B', 'C']
+        self.bandit_indices = {'A': 0,
+                                'B': 1,
+                                'C': 2}
         self.played = {'A': 0,
                        'B': 0,
                        'C': 0}
@@ -48,25 +51,25 @@ class ABBandit:
                            'B': 1,
                            'C': 1}
 
-    def sample(self, bandit, mode):
-        if mode == 'Thompson sampling':
-            return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
-        elif mode == 'Optimistic Thompson':
-            return np.random.beta(self.pri_post_a[bandit]+300, self.pri_post_b[bandit]+100)
+    def sample(self, bandit):
+        return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
 
     def pull_arm(self, bandit, rounds, mode='Human'):
         if mode == 'Thompson sampling':
             # Thompson sampling
-            bandits_prob = np.argmax([self.sample(b, mode=mode) for b in self.bandits])
+            bandit_sample_probs = [self.sample(b) for b in self.bandits]
+            bandits_prob = np.argmax(bandit_sample_probs)
             bandit = self.bandits[bandits_prob]
-        elif mode == 'Optimistic Thompson':
-            bandits_prob = np.argmax([self.sample(b) for b in self.bandits])
-            bandit = self.bandits[bandits_prob]
+            bandit_index = self.bandit_indices[bandit]
         else:
             pass
         for i in range(rounds):
             if self.games_left > 0:
-                random_chance = np.random.rand()
+                if mode == 'Thompson sampling':
+                    # we use the random chance we drew from posteriors
+                    random_chance = bandit_sample_probs[bandit_index]
+                else:
+                    random_chance = np.random.rand()
                 self.played[bandit] += 1
                 self.overall_played += 1
                 if random_chance < self.actual_win_rate[bandit]:
@@ -113,13 +116,8 @@ def run_experiment():
                            buttons=[{'label': 'A', 'value': 'A'},
                                     {'label': 'B', 'value': 'B'},
                                     {'label': 'C', 'value': 'C'},
-                                    {'label': 'Thompson sampling', 'value': 'Thompson sampling'},
-                                    {'label': 'Optimistic Thompson', 'value': 'Optimistic Thompson'}])
+                                    {'label': 'Thompson sampling', 'value': 'Thompson sampling'}])
         if add_more == 'Thompson sampling':
-            rounds = 1
-            for i in range(bandit_challenge.games_left):
-                df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
-        elif add_more == 'Optimistic Thompson':
             rounds = 1
             for i in range(bandit_challenge.games_left):
                 df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
