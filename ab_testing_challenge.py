@@ -18,31 +18,31 @@ class ABBandit:
     def __init__(self, number_of_trials=6000):
         # general setup
         self.reward_per_win = 50
-        self.bandits = ['A', 'B', 'C']
+        self.bandits = ['A', 'B', 'C', 'D']
         self.bandit_indices = {'A': 0,
                                 'B': 1,
                                 'C': 2,
-                                 'D': 3}
+                                'D': 3}
         self.played = {'A': 0,
                        'B': 0,
                        'C': 0,
-                        'D': 0}
+                       'D': 0}
         self.wins = {'A': 0,
                      'B': 0,
                      'C': 0,
-                      'D': 0}
+                     'D': 0}
         self.actual_win_rate = {'A': 0.03,
                                 'B': 0.02,
                                 'C': 0.035,
-                                 'D': 0.027}
+                                'D': 0.027}
         self.observed_win_rate = {'A': 0.0,
                                   'B': 0.0,
                                   'C': 0.0,
-                                   'D': 0.0}
+                                  'D': 0.0}
         self.money_won = {'A': 0.0,
                           'B': 0.0,
                           'C': 0.0,
-                           'D': 0.0}
+                          'D': 0.0}
         self.overall_played = 0
         self.overall_wins = 0
         self.overall_winrate = 0
@@ -53,11 +53,11 @@ class ABBandit:
         self.pri_post_a = {'A': 1,
                            'B': 1,
                            'C': 1,
-                            'D': 1}
+                           'D': 1}
         self.pri_post_b = {'A': 1,
                            'B': 1,
                            'C': 1,
-                            'D': 1}
+                           'D': 1}
 
     def sample(self, bandit):
         return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
