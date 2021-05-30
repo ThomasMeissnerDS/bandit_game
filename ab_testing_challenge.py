@@ -65,11 +65,7 @@ class ABBandit:
             pass
         for i in range(rounds):
             if self.games_left > 0:
-                if mode == 'Thompson sampling':
-                    # we use the random chance we drew from posteriors
-                    random_chance = bandit_sample_probs[bandit_index]
-                else:
-                    random_chance = np.random.rand()
+                random_chance = np.random.rand()
                 self.played[bandit] += 1
                 self.overall_played += 1
                 if random_chance < self.actual_win_rate[bandit]:
