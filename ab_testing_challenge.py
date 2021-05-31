@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
 import pandas as pd
+from scipy.stats import beta
 
 ab_testing_challenge = Flask(__name__)
 
@@ -61,6 +62,18 @@ class ABBandit:
 
     def sample(self, bandit):
         return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
+    
+    def plot_posteriors(self):
+        x = np.linspace(0, 0.1, 200)
+        fig = go.Figure()
+        for bandit in self.bandits:
+            y = beta.pdf(x, self.pri_post_a[bandit], self.pri_post_b[bandit])
+            fig.add_trace(go.Scatter(x=x, y=y,
+                                     mode='lines',
+                                     name=bandit))
+        fig.update_layout(title_text='Posterior distributions of bandit win rates')
+        html = fig.to_html(include_plotlyjs="require", full_html=False)
+        return html
 
     def pull_arm(self, bandit, rounds, mode='Human'):
         if mode == 'Thompson sampling':
@@ -126,6 +139,8 @@ def run_experiment():
             rounds = 1
             for i in range(bandit_challenge.games_left):
                 df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Thompson sampling')
+            fig = bandit_challenge.plot_posteriors()
+            put_html(fig).send()
         else:
             rounds = input("How many rounds do you want to play?", value='1', type=NUMBER)
             df_overview = bandit_challenge.pull_arm(add_more, rounds, mode='Human')
