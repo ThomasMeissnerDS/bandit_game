@@ -16,14 +16,20 @@ ab_testing_challenge = Flask(__name__)
 
 # defining the bandit set up
 class ABBandit:
-    def __init__(self, number_of_trials=6000):
+    def __init__(self, number_of_trials=6000, difficulty=5):
         # general setup
         self.reward_per_win = 50
         self.bandits = ['A', 'B', 'C', 'D']
+        if difficulty > 10:
+            self.difficulty_rate = 1
+        elif difficulty < 1:
+            self.difficulty_rate = 10
+        else:
+            self.difficulty_rate = 11-difficulty
         self.bandit_indices = {'A': 0,
-                                'B': 1,
-                                'C': 2,
-                                'D': 3}
+                               'B': 1,
+                               'C': 2,
+                               'D': 3}
         self.played = {'A': 0,
                        'B': 0,
                        'C': 0,
@@ -36,6 +42,10 @@ class ABBandit:
                                 'B': 0.02,
                                 'C': 0.035,
                                 'D': 0.027}
+        # update winrates by chosen difficulty
+        for a in self.bandits:
+            self.actual_win_rate[a] = self.actual_win_rate[a]*self.difficulty_rate
+
         self.observed_win_rate = {'A': 0.0,
                                   'B': 0.0,
                                   'C': 0.0,
@@ -62,9 +72,9 @@ class ABBandit:
 
     def sample(self, bandit):
         return np.random.beta(self.pri_post_a[bandit], self.pri_post_b[bandit])
-    
+
     def plot_posteriors(self):
-        x = np.linspace(0, 0.1, 200)
+        x = np.linspace(0, 1, 200)
         fig = go.Figure()
         for bandit in self.bandits:
             y = beta.pdf(x, self.pri_post_a[bandit], self.pri_post_b[bandit])
@@ -124,9 +134,10 @@ def generate_bar_charts(df, x_axis, y_axis, title):
 def run_experiment():
     # instantiate bandits
     random_seed = input("Set random seed (any integer)", value='1', type=NUMBER)
+    chosen_difficulty = input("Set a difficulty (easy:1, hard: 10)", value='1', type=NUMBER)
     np.random.seed(random_seed)
     number_of_trials = input("What shall be the max. no. of rounds?", value='6000', type=NUMBER)
-    bandit_challenge = ABBandit(number_of_trials=number_of_trials)
+    bandit_challenge = ABBandit(number_of_trials=number_of_trials, difficulty=chosen_difficulty)
     add_more = True
     while add_more:
         add_more = actions(label="Which bandit do you chose?",
